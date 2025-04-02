@@ -1,0 +1,117 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <link href="../QRstyle.css" rel="stylesheet" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+
+
+    <title></title>
+
+    
+</head>
+<body>
+    <script>      
+        function displayQR() {
+            var txtQrcD = document.getElementById("txtQR").value;
+            var imgbox = document.getElementById("imgbox");            
+            var imgQr = document.getElementById("imgqr");
+            if (txtQrcD !== "") {
+                if (txtQrcD.includes("http"))
+                    imgQr.src = "https://qrtag.net/api/qr_4.png?url=" + txtQrcD;
+                else                  
+                    imgQr.src = "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=" + txtQrcD;
+               
+            }
+           
+           else {
+                alert("please enter the vaild text")
+            }
+            
+        }
+
+        function QRdownLoad() {
+            var dwnload = document.getElementById("btnDownld");
+            var imgQr = document.getElementById("imgqr");
+            var SetImg = document.getElementById("imgbox1");
+            let imgSrc = imgQr.getAttribute('src');
+            if (imgQr !== null) {
+                let imgName = imgSrc.split("=")[2]
+                
+            fetch(imgSrc)
+                .then(response => response.blob()) // Convert the response to a Blob (binary data)
+                .then(blob => {
+                    const img = new Image();
+                    const url = URL.createObjectURL(blob); // Create a URL for the image blob
+                    
+                    img.onload = function() {
+                        
+                        // Step 3: Draw the image to the canvas
+                        const canvas = document.createElement('canvas');
+                        const ctx = canvas.getContext("2d");
+                        canvas.width = img.width;
+                        canvas.height = img.height;
+                        ctx.drawImage(img, 0, 0);
+                        
+                        // Step 4: Convert the image to a different format (e.g., PNG or JPG)
+                        const convertedImage = canvas.toDataURL("image/webp"); // Can also use "image/png" or "image/webp"
+                        
+                        // Step 5: Use the converted image (for example, create a download link)
+                        const link = document.createElement("a");
+                        link.href = convertedImage;
+                        link.download = imgName + ".jpg"; // Name of the file to download
+                        link.textContent = "Download QR Code";
+                        SetImg.appendChild(link);
+                        
+                    };
+
+                    img.src = url; // Set the image source
+                    
+                })
+               
+            } else {
+                alert("QR code image not found.");
+            }
+        }
+
+
+        
+    </script>
+    <div class="wrapper">
+        <div class="box_body">
+            <div class="row">
+                <div class="col-sm-12" style="padding-top:40px;">
+                    <div class="col-sm-6">
+                        <label class="lblbold">Generator the QR Code</label>
+                        <div class="row" style="padding:30px;">
+                            <label style="font-size:15px">Enter the Text OR Link:<span style="color:red">*</span></label>
+                            <input class="form-control" style="height:35px; width:300px; margin-top:5px;" id="txtQR" placeholder="Enter the  Text OR Link " />
+                            <div class="row" style="padding-top:15px; padding-left:20px">
+                                <button style="width:150px;" id="btnGen"  onclick="displayQR()" class="btn btn-success">Generate QR</button>
+                                <button style="width:140px;" id="btnDownld" onclick="QRdownLoad()" class="btn btn-info active">Download QR</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <center>
+                            <label style="color:darkgray; font-size:15px; padding:20px; padding-left:10px; padding-bottom:0px;"> Your QR Code</label><br />
+                            
+                        </center>
+                        <div  style="color:darkgray; font-size:15px; padding:5px; padding-left:75px; margin:0px;  width:100%; overflow:hidden" id ="imgbox">
+                            <img id="imgqr" src="" style="height:150px; width:150px;" />
+                           <div id="imgbox1">
+
+                           </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
